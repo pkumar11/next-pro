@@ -1,8 +1,16 @@
-import Link from "next/link";
-import { buttonVariants } from "../ui/button";
-import { ThemeToggle } from "./theme-toogle";
+"use client";
 
-const Navbar = () => {
+import { Button, buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
+import { useConvexAuth } from "convex/react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { ThemeToggle } from "./theme-toogle";
+import { toast } from "sonner";
+
+export function Navbar() {
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  const router = useRouter();
   return (
     <nav className="w-full  py-5 flex items-center justify-between">
       <div className="flex items-center gap-8 ">
@@ -24,9 +32,30 @@ const Navbar = () => {
           </Link>
         </div>
       </div>
-         <div className="flex items-center gap-2">
-        {/* <div className="hidden md:block mr-2"> */}
- <Link className={buttonVariants()} href="/auth/sign-up">
+
+      <div className="flex items-center gap-2">
+        <div className="hidden md:block mr-2"></div>
+        {isLoading ? null : isAuthenticated ? (
+          <Button
+            onClick={() =>
+              authClient.signOut({
+                fetchOptions: {
+                  onSuccess: () => {
+                    toast.success("Logged out successfully");
+                    router.push("/");
+                  },
+                  onError: (error) => {
+                    toast.error(error.error.message);
+                  },
+                },
+              })
+            }
+          >
+            Logout
+          </Button>
+        ) : (
+          <>
+            <Link className={buttonVariants()} href="/auth/sign-up">
               Sign up
             </Link>
             <Link
@@ -35,11 +64,10 @@ const Navbar = () => {
             >
               Login
             </Link>
-        {/* </div> */}
-      <ThemeToggle />
-        </div>
+          </>
+        )}
+        <ThemeToggle />
+      </div>
     </nav>
   );
-};
-
-export default Navbar;
+}

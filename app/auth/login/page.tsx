@@ -1,6 +1,6 @@
 "use client";
 
-import { signUpSchema } from "@/app/schemas/auth";
+import { loginSchema } from "@/app/schemas/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,41 +10,42 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  FieldGroup,
   Field,
-  FieldLabel,
   FieldError,
+  FieldGroup,
+  FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import z from "zod";
 import { useTransition } from "react";
+import { Controller, useForm } from "react-hook-form";
+import z from "zod";
+import { toast } from "sonner";
 
-function signUp() {
+export default function LoginPage() {
   const [isPending, startTransition] = useTransition();
+
   const router = useRouter();
   const form = useForm({
-    resolver: zodResolver(signUpSchema), //validate the form data against the zod schema
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
-      name: "",
+
       password: "",
     },
   });
 
-  async function onSubmit(data: z.infer<typeof signUpSchema>) {
+  function onSubmit(data: z.infer<typeof loginSchema>) {
     startTransition(async () => {
-      await authClient.signUp.email({
+      await authClient.signIn.email({
         email: data.email,
-        name: data.name,
         password: data.password,
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Account created successfully");
+            toast.success("Logged in successfully");
             router.push("/");
           },
           onError: (error) => {
@@ -54,34 +55,16 @@ function signUp() {
       });
     });
   }
-
   return (
     <div className="py-12">
       <Card className="w-full max-w-xl mx-auto">
         <CardHeader>
-          <CardTitle>Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
+          <CardTitle>Login</CardTitle>
+          <CardDescription>Login to get started</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup className="gap-y-4">
-              <Controller
-                name="name"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field>
-                    <FieldLabel>Full Name</FieldLabel>
-                    <Input
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Please enter your full name"
-                      {...field}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
               <Controller
                 name="email"
                 control={form.control}
@@ -90,7 +73,7 @@ function signUp() {
                     <FieldLabel>Email</FieldLabel>
                     <Input
                       aria-invalid={fieldState.invalid}
-                      placeholder="Please enter your email"
+                      placeholder="john@doe.com"
                       type="email"
                       {...field}
                     />
@@ -119,7 +102,17 @@ function signUp() {
                   </Field>
                 )}
               />
-              <Button>Sign up</Button>
+
+              <Button disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <span>Login</span>
+                )}
+              </Button>
             </FieldGroup>
           </form>
         </CardContent>
@@ -127,5 +120,3 @@ function signUp() {
     </div>
   );
 }
-
-export default signUp;
