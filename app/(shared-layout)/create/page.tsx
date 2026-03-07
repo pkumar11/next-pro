@@ -42,15 +42,11 @@ export default function CreateRoute() {
     },
   });
   function onSubmit(values: z.infer<typeof postSchema>) {
-    startTransition(async() => {
- await createBlogAction(values);
-        // mutation({
-        //     body: values.content,
-        //     title: values.title,
-        // })
-        toast.success("Post created successfully");
-  
-    })
+    startTransition(async () => {
+      await createBlogAction(values);
+
+      toast.success("Post created successfully");
+    });
   }
 
   return (
@@ -96,7 +92,7 @@ export default function CreateRoute() {
                 render={({ field, fieldState }) => (
                   <Field>
                     <FieldLabel>Content</FieldLabel>
-                 <Textarea
+                    <Textarea
                       aria-invalid={fieldState.invalid}
                       placeholder="Super cool blog content"
                       {...field}
