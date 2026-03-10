@@ -9,8 +9,17 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         protocol: "https",
         port: "",
+      }, {
+        hostname: "giant-mallard-78.eu-west-1.convex.cloud",
+        protocol: "https",
+        port: "",
       },
-      
+      {
+        hostname: "giant-mallard-78.eu-west-1.convex.cloud",
+        protocol: "https",
+        port: "",
+      },
+     
     ],
   },
 };
